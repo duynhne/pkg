@@ -1,0 +1,25 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Go quality checks (test + lint)
+  go-check:
+    uses: duyhenryer/shared-workflows/.github/workflows/go-check.yml@main
+    with:
+      command-test: 'go test -race -coverprofile=coverage.out ./...'
+      lint: true
+    secrets: inherit
+
+  # SonarCloud analysis
+  sonar:
+    needs: go-check
+    uses: duyhenryer/shared-workflows/.github/workflows/sonarqube.yml@main
+    with:
+      project-key: 'duynhne_pkg'
+      organization: 'duynhne'
+    secrets: inherit
